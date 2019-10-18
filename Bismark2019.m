@@ -11,8 +11,6 @@ step(P1s,Tsim)
 P1z = c2d(P1s,Ts);
 d = P1z.InputDelay;
 
-V = (5.155*z^3 - 9.848*z^2 + 4.704*z)/(z-0.9)^2/(z-0.74);
-
 [A,B,C,D]  = tf2ss(P1z.num{1},P1z.den{1});
 A = A';
 buff = B';
@@ -21,9 +19,30 @@ C = buff;
 
 beta = [0.92 0.92];
 
+betaf = 0.89;
+beta1 = 0.9;
+beta2 = 0.9;
+beta3 = 0.74;
+p1 = 0.92;
+p2 = 0.92;
+
 K = acker(A,B,beta)
 Kr = inv(C/(eye(size(A))+B*K-A)*B);
-F = Kr*(1-0.89)^2*z^2/(z-0.89)^2;
+F = Kr*(1-betaf)^2*z^2/(z-betaf)^2;
 
-sim('Bismark2019Simu')
 
+% -------------
+
+V = (5.155*z^3 - 9.848*z^2 + 4.704*z)/(z-beta1)^2/(z-beta3);
+
+% sim('Bismark2019Simu')
+
+syms v0 v1 v2
+vv = [v0 v1 v2]';
+V1 = (v0 + v1 + v2)/(1-beta1)/(1-beta2)/(1-beta3);
+Vp1 = (v0 + v1*p1^-1 + v2*p1^-2)/(1-beta1)/(1-beta2)/(1-beta3);
+Vp2 = (v0 + v1*p2^-1 + v2*p2^-2)/(1-beta1)/(1-beta2)/(1-beta3);
+
+S1 = 1 + (K - V1*C)*((eye(size(A)) - A)\B);
+Sp1 = 1 + (K - Vp1*C)*((eye(size(A)) - A)\B);
+Sp2 = 1 + (K - Vp2*C)*((eye(size(A)) - A)\B);
