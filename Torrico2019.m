@@ -35,7 +35,7 @@ F = Kr*(1-betaf)^2*z^2/(z-betaf)^2;
 
 V = (5.155*z^3 - 9.848*z^2 + 4.704*z)/(z-beta1)^2/(z-beta3);
 
-% sim('Bismark2019Simu')
+sim('Torrico2019Simu')
 
 syms v0 v1 v2
 vv = [v0 v1 v2]';
