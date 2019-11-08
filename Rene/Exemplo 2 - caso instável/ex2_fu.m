@@ -167,7 +167,7 @@ Frp = tf([(1-betaf1)*(1-betaf2),0,0],[1,-(betaf1+betaf2),betaf1*betaf2],Ts);
 Frz = tf([1,-(alphaf1+alphaf2),alphaf1*alphaf2],[(1-alphaf1)*(1-alphaf2),0,0],Ts);
 Fr = minreal(Frp*Frz);
 
-sim('nonmininumS')
+sim('nonmininumS_2018a')
 
 % robustez
 
