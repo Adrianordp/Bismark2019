@@ -2,4 +2,4 @@
 *.slx.autosave
 slprj/
 *.slxc
-*.m~
+*~
