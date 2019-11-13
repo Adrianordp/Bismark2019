@@ -64,7 +64,7 @@ L0 = acker(Ae',Ce',[-2 -2 -2 -2])';
 
 K = K0*inv(s*eye(4) - Ae + Be*K0 + L0*Ce)*L0;
 
-sim fu_adrc2
+sim fu_adrc2_2018a
 
 % robustez
 

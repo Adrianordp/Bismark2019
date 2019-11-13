@@ -12,6 +12,8 @@ z = tf('z',Ts);
 P1s = 2*exp(-0.3*s)/(3*s-1)/(s-1);
 P1z = c2d(P1s,Ts)
 d = P1z.InputDelay;
+G1s = 2/(3*s-1)/(s-1);
+G1z = c2d(G1s,Ts);
 
 [A,B,C,D]  = tf2ss(P1z.num{1},P1z.den{1});
 A = A';
@@ -54,8 +56,44 @@ v0 = eval(V.v0);
 v1 = eval(V.v1);
 v2 = eval(V.v2);
 V = (v0*z^3 + v1*z^2 + v2*z)/(z-beta1)/(z-beta2)/(z-beta3);
-V
-% V = (231.6095*z^3 - 455.3408*z^2 + 223.9279*z)/(z-beta1)^3;
-sim('Torrico2019Simu')
+V = (231.6095*z^3 - 455.3408*z^2 + 223.9279*z)/(z-beta1)^3;
+
+[r,p,k] = residue(conv(G1z.num{1},V.num{1}),conv(G1z.den{1},V.den{1}));
+
+eV = eig(V);
+pos = [3;4;5];
+
+Vs = 0;
+for i = 1:length(pos)
+    Vs = Vs + r(pos(i))/(z-p(pos(i)))^i;
+end
+% V = Vs;
+% Vs = -(0.080908)*(z-0.1255)*(z-2.467)/(z-0.53)^3;
+Vs = -(0.087574)*(z-4.108)*(z-0.1098)/(z-0.53)^3;
+% V = Vs;
+S = Vs*z^-d;
+for i = 1:d
+    S = S + K*A^(i-1)*B*z^-i;
+end
+sim('Torrico2019SimuEx2')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
