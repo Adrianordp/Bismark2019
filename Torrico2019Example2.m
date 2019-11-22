@@ -42,15 +42,15 @@ F = minreal(Kr*(1-betaf)^2*z^2/(z-betaf)^2*(1-alphaf*z^-1)^nz/(1-alphaf)^nz);
 Ng_p1 = G1z.num{1}(1)*p1+G1z.num{1}(2)*p1+G1z.num{1}(3)*p1;
 Ng_p2 = G1z.num{1}(1)*p2+G1z.num{1}(2)*p2+G1z.num{1}(3)*p2;
 
-% Falta o Nga 
+% Falta o Nga
 
-A_v = [1    1       1    ;
-       1 p1^(-1) p1^(-2) ;
+A_v = [1      1       1
+       1 p1^(-1) p1^(-2)
        1 p2^(-1) p2^(-2)];
-B_v = [Kr*(1+beta1)^d;
-       Nga_p1*p1^d*(1-p1^(-1)*beta1)^d/Ng_p1;
-       Nga_p2*p2^d*(1-p2^(-1)*beta1)^d/Ng_p2];   
-vs = inv(A_v)*B_v
+B_v = [Kr*(1+beta1)^d
+       Nga_p1*p1^d*(1-p1^(-1)*beta1)^d/Ng_p1
+       Nga_p2*p2^d*(1-p2^(-1)*beta1)^d/Ng_p2];
+vs = A_v\B_v
 
 
 
