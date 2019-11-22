@@ -21,19 +21,41 @@ buff = B';
 B = C';
 C = buff;
 
-beta = [0.942873148162653 0.942873148162653];
+p1 = exp((-1/0.85)*Ts);
+p2 = p1;
+beta = [p1 p2];
 
 alphaf= 0.94;
 betaf = 0.8985;
 beta1 = 0.53;
 beta2 = 0.53;
 beta3 = 0.53;
-p  = round(roots(P1z.den{1})*1e8)/1e8; % rounded open-loop poles
+% p  = round(roots(P1z.den{1})*1e8)/1e8; % rounded open-loop poles
+p  = roots(P1z.den{1}); % rounded open-loop poles
 nz = 2;
 
 K = acker(A,B,beta)
+% K = [110.0255 101.6672];
 Kr = inv(C/(eye(size(A))+B*K-A)*B);
 F = minreal(Kr*(1-betaf)^2*z^2/(z-betaf)^2*(1-alphaf*z^-1)^nz/(1-alphaf)^nz);
+
+Ng_p1 = G1z.num{1}(1)*p1+G1z.num{1}(2)*p1+G1z.num{1}(3)*p1;
+Ng_p2 = G1z.num{1}(1)*p2+G1z.num{1}(2)*p2+G1z.num{1}(3)*p2;
+
+% Falta o Nga 
+
+A_v = [1    1       1    ;
+       1 p1^(-1) p1^(-2) ;
+       1 p2^(-1) p2^(-2)];
+B_v = [Kr*(1+beta1)^d;
+       Nga_p1*p1^d*(1-p1^(-1)*beta1)^d/Ng_p1;
+       Nga_p2*p2^d*(1-p2^(-1)*beta1)^d/Ng_p2];   
+vs = inv(A_v)*B_v
+
+
+
+
+
 
 % Solution for V(z)
 syms v0 v1 v2
@@ -51,12 +73,12 @@ Z   = p(2);
 Vp2 = (v0 + v1*Z^-1 + v2*Z^-2)/(1-beta1*Z^-1)/(1-beta2*Z^-1)/(1-beta3*Z^-1);
 Sp2 = 1 + (K - Z^-d*Vp2*C)*((eye(size(A))*Z - A)\B);
 % Solve linear problem
-V = solve(S1==0,Sp1==0,Sp2==0,v0,v1,v2);
+V  = solve(S1==0,Sp1==0,Sp2==0,v0,v1,v2);
 v0 = eval(V.v0);
 v1 = eval(V.v1);
 v2 = eval(V.v2);
 V = (v0*z^3 + v1*z^2 + v2*z)/(z-beta1)/(z-beta2)/(z-beta3);
-V = (231.6095*z^3 - 455.3408*z^2 + 223.9279*z)/(z-beta1)^3;
+% V = (231.6095*z^3 - 455.3408*z^2 + 223.9279*z)/(z-beta1)^3;
 
 [r,p,k] = residue(conv(G1z.num{1},V.num{1}),conv(G1z.den{1},V.den{1}));
 

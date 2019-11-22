@@ -18,10 +18,14 @@ d   = P1z.InputDelay;
 
 % Space-state system (must be a observable cannonical form)
 [A,B,C,D]  = tf2ss(P1z.num{1},P1z.den{1});
-A = A';
-buff = B';
-B = C';
-C = buff;
+[Vect,Diag] = eig(A);
+A = Diag;
+B = Vect\B;
+C = C*Vect;
+% A = A';
+% buff = B';
+% B = C';
+% C = buff;
 
 % Pole definition
 beta   = [0.92 0.92]; % Desirable poles for closed loop system
@@ -30,7 +34,8 @@ betaf  = 0.89       ; % Reference filter (pole)
 beta1  = 0.90       ; % Robustness filter tunning
 beta2  = 0.90       ; % Robustness filter tunning
 beta3  = 0.74       ; % Robustness filter tunning (attenuate measur. noise)
-p      = round(roots(P1z.den{1})*1e8)/1e8; % rounded open-loop poles
+% p      = round(roots(P1z.den{1})*1e8)/1e8; % rounded open-loop poles
+p      = roots(P1z.den{1}); % rounded open-loop poles
 nz     = 2          ; % Order of the alphaf filter for F(z)
 
 % Control gain
