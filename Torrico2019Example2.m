@@ -9,8 +9,8 @@ noisePower = 0.00001; % Noise input power
 
 Ts = 0.05;
 z = tf('z',Ts);
-P1s = 2*exp(-0.3*s)/(3*s-1)/(s-1);
-P1z = c2d(P1s,Ts)
+P1s = 2/(3*s-1)/(s-1)*exp(-0.3*s);
+P1z = c2d(P1s,Ts);
 d = P1z.InputDelay;
 G1s = 2/(3*s-1)/(s-1);
 G1z = c2d(G1s,Ts);
@@ -36,26 +36,24 @@ nz = 2;
 
 K = acker(A,B,beta)
 % K = [110.0255 101.6672];
-Kr = inv(C/(eye(size(A))+B*K-A)*B);
+Kr = 1/(C/(eye(size(A))+B*K-A)*B);
 F = minreal(Kr*(1-betaf)^2*z^2/(z-betaf)^2*(1-alphaf*z^-1)^nz/(1-alphaf)^nz);
 
-Ng_p1 = G1z.num{1}(1)*p1+G1z.num{1}(2)*p1+G1z.num{1}(3)*p1;
-Ng_p2 = G1z.num{1}(1)*p2+G1z.num{1}(2)*p2+G1z.num{1}(3)*p2;
+G1a = K*((z*eye(2)-A)\B);
 
-% Falta o Nga
+Ng_p1 = polyval(G1z.num{1},p(1));
+Ng_p2 = polyval(G1z.num{1},p(2));
 
-A_v = [1      1       1
-       1 p1^(-1) p1^(-2)
-       1 p2^(-1) p2^(-2)];
-B_v = [Kr*(1+beta1)^d
-       Nga_p1*p1^d*(1-p1^(-1)*beta1)^d/Ng_p1
-       Nga_p2*p2^d*(1-p2^(-1)*beta1)^d/Ng_p2];
+Nga_p1 = polyval(G1a.num{1},p(1));
+Nga_p2 = polyval(G1a.num{1},p(2));
+
+A_v = [1        1         1
+       1 p(1)^(-1) p(1)^(-2)
+       1 p(2)^(-1) p(2)^(-2)];
+B_v = [Kr*(1-beta1)^d
+       Nga_p1*p(1)^d*(1-p(1)^-1*beta1)^d/Ng_p1
+       Nga_p2*p(2)^d*(1-p(2)^-1*beta1)^d/Ng_p2];
 vs = A_v\B_v
-
-
-
-
-
 
 % Solution for V(z)
 syms v0 v1 v2
@@ -78,6 +76,7 @@ v0 = eval(V.v0);
 v1 = eval(V.v1);
 v2 = eval(V.v2);
 V = (v0*z^3 + v1*z^2 + v2*z)/(z-beta1)/(z-beta2)/(z-beta3);
+% V = (vs(1)*z^3 + vs(2)*z^2 + vs(3)*z)/(z-beta1)/(z-beta2)/(z-beta3);
 % V = (231.6095*z^3 - 455.3408*z^2 + 223.9279*z)/(z-beta1)^3;
 
 [r,p,k] = residue(conv(G1z.num{1},V.num{1}),conv(G1z.den{1},V.den{1}));
@@ -97,6 +96,8 @@ S = Vs*z^-d;
 for i = 1:d
     S = S + K*A^(i-1)*B*z^-i;
 end
+% S = minreal(S);
+S = (conv(G1a.num{1},Vs.den{1}) - conv(Vs.num{1},G1z.num{1})*z^-d)/conv(G1z.den{1},Vs.den{1})
 sim('Torrico2019SimuEx2')
 
 
