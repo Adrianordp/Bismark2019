@@ -147,7 +147,6 @@ end
 
 S = minreal(parallel(S_,-aux1*iz^d))
 
-
 % % Forma 2
 % S = minreal(g_ - V*Gd*z^-d)
 % 

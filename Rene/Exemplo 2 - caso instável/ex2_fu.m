@@ -125,9 +125,9 @@ V = minreal((x(1)+x(2)*iz+x(3)*iz^2)/((1-a1*inv(z))*(1-a2*inv(z))*(1-a3*inv(z)))
 % S = minreal(S_ + tf(Nv_,dV,Ts))
 
 % Forma 3
-Snum = [conv(ng_,dV) zeros(1,dn)] - [zeros(1,dn) conv(nV,nG)]
+Snum = [conv(ng_,dV) zeros(1,dn)] - [zeros(1,dn) conv(nV,nG)];
 Sden = [conv(dG,dV) zeros(1,dn)];
-S = minreal(tf(Snum,Sden,Ts))
+S = minreal(tf(Snum,Sden,Ts));
 
 % % Forma 1 Bismark
 % Ab = [];

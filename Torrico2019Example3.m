@@ -9,11 +9,11 @@ noiseTime  = 20  ; % Noise input time
 noisePower = 1e-7; % Noise input power
 
 % System
-P1s = 2/(3*s-1)/(s-1)*exp(-0.3*s);
-G1s = 2/(3*s-1)/(s-1);
+P1s = (1-0.2*s)/s/(s-1)*exp(-0.2*s);
+G1s = (1-0.2*s)/s/(s-1);
 
 % Discretization
-Ts = 0.05;
+Ts = 0.01;
 z = tf('z',Ts);
 P1z = c2d(P1s,Ts);
 d = P1z.InputDelay;
@@ -27,14 +27,14 @@ B = C';
 C = buff;
 
 % Pole definition
-p1    = exp((-1/0.85)*Ts);
+p1    = 0.95;
 p2    = p1;
 beta  = [p1 p2];
-alphaf= 0.94;
-betaf = 0.8985;
-beta1 = 0.53;
-beta2 = 0.53;
-beta3 = 0.53;
+alphaf= 0.00;
+betaf = 0.99;
+beta1 = 0.99;
+beta2 = 0.99;
+beta3 = 0.99;
 p  = roots(P1z.den{1}); % rounded open-loop poles
 nz = 2;
 
