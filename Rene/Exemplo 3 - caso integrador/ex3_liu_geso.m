@@ -1,4 +1,4 @@
-% descomentar até lamb
+% descomentar atï¿½ lamb
 % % clear all
 % % close all
 % % clc
