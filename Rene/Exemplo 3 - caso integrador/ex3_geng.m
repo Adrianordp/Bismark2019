@@ -71,30 +71,32 @@ g2 = rd(2);
 
 d = L/Ts;
 
-syms w v0 v1 v2 numV
+syms w v0 v1 v2
 
 numG_ = poly2sym(ng_,w);
 denG_ = poly2sym(dG,w);
-numG = poly2sym(nG,w);
-denG = poly2sym(dG,w);
-numV = v0 + v1*w^-1 + v2*w^-2
-denV = (1-a1*w^-1)*(1-a2*w^-1)*(1-a3*w^-1)
+numG  = poly2sym(nG,w);
+denG  = poly2sym(dG,w);
+numV  = v0 + v1*w^-1 + v2*w^-2;
+denV  = (1-a1*w^-1)*(1-a2*w^-1)*(1-a3*w^-1);
 
 S_1 = denG*denV + numG_*denV - numG*numV*w^-d;
 S_diff = diff(S_1,w)
 
 num = subs(S_diff,w,1)
 
-v0af = coeffs(num,v0);
-v1af = coeffs(num,v1);
-v2af = coeffs(num,v2);
+v0af   = coeffs(num,v0);
+v1af   = coeffs(num,v1);
+v2af   = coeffs(num,v2);
 coefbf = double(coeffs(num));
 
-af = [1 1 1;1 1/g1 1/g1^2;double(v0af(end)) double(v1af(end)) double(v2af(end))]
+af = [              1                 1                 1
+                    1              1/g1            1/g1^2
+      double(v0af(end)) double(v1af(end)) double(v2af(end))]
 aux = ng_nG*(1-a1*iz)*(1-a2*iz)*(1-a3*iz)*z^d;
-bf = [evalfr(aux,1);
-    evalfr(aux,g1);
-    -coefbf(1)];
+bf = [ evalfr(aux,1)
+      evalfr(aux,g1)
+          -coefbf(1)];
 x = inv(af)*bf
 V = minreal((x(1)+x(2)*iz+x(3)*iz^2)/((1-a1*inv(z))*(1-a2*inv(z))*(1-a3*inv(z))))
 %bf
