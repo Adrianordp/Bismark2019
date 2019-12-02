@@ -21,7 +21,7 @@ legend('y(t)','r(t)')
 figure                      % Initialize figure frame
 plot(t,u,'LineWidth',2)     % Plot curves
 grid on                     % Enable grid
-% axis([min(t) max(t) -5 10]) % Limit axes
+axis([min(t) max(t) -5 10]) % Limit axes
 % Name labels
 xlabel('Time [sample]')
 ylabel('u(t)')

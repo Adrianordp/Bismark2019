@@ -4,7 +4,7 @@ s = tf('s');
 % Example 3 ---------------------------------------------------------------
 % Simulation parameters
 Tsim       = 25  ; % Total time
-distTime   = 100 ; % Dis
+distTime   = 10  ; % Dis
 noiseTime  = 20  ; % Noise input time
 noisePower = 1e-7; % Noise input power
 
@@ -45,10 +45,11 @@ K = acker(A,B,beta); % K = [110.0255 101.6672];
 Kr = 1/(C/(eye(size(A))+B*K-A)*B);
 F = minreal(Kr*(1-betaf)^2*z^2/(z-betaf)^2*(1-alphaf*z^-1)^nz/(1-alphaf)^nz);
 
-[G1aNum G1aDen] = ss2tf(A,B,K,0);
+[G1aNum, G1aDen] = ss2tf(A,B,K,0);
 
 nG  = G1z.num{1}; nG = nG(2:end);
 nGa = G1aNum(2:end);
+denV  = conv(conv([1 -beta1],[1 -beta2]),[1 -beta3]);
 
 Ng_p1 = polyval(nG,p(1));
 Ng_p2 = polyval(nG,p(2));
@@ -56,18 +57,22 @@ Ng_p2 = polyval(nG,p(2));
 Nga_p1 = polyval(nGa,p(1));
 Nga_p2 = polyval(nGa,p(2));
 
-% Computing V(z) (v0, v1 and v2)
-A_v = [  1      1      1
+numAux = conv(conv(denV,nGa),eye(1,d+1));
+denAux = nG;
+
+numD = conv(polyder(numAux),denAux) - conv(polyder(denAux),numAux);
+denD = conv(denAux,denAux);
+
+A_v = [     1      1   1
        p(1)^3 p(1)^2 p(1)
-       p(2)^3 p(2)^2 p(2)];
+            3      2   1];
 B_v = [Kr*(1-beta1)^3
        Nga_p1*p(1)^d*(p(1)-beta1)^3/Ng_p1
-       Nga_p2*p(2)^d*(p(2)-beta1)^3/Ng_p2];
-vs = A_v\B_v
+       polyval(numD,p(2))/polyval(denD,p(2))];
+v = A_v\B_v
 
-V = (vs(1)*z^3 + vs(2)*z^2 + vs(3)*z)/(z-beta1)/(z-beta2)/(z-beta3);
-denV  = V.den{1};
-
+V = tf([v(1) v(2) v(3) 0],denV,Ts);
+% V =
 %   3.123 z^3 - 6.237 z^2 + 3.114 z
 %   --------------------------------
 %   z^3 - 2.97 z^2 + 2.94 z - 0.9703
@@ -82,9 +87,9 @@ phiS = minreal(phiS);
 numPhiS(1) = 1;
 c = conv(numPhiS,denV);
 
-A = [     1      1   1
-     p(1)^3 p(1)^2 p(1)
-          3      2   1 ];
+A = [     1      1    1
+     p(1)^3 p(1)^2  p(1)
+          3      2    1];
 
 Z = 1;
 b1 = -polyval(c,Z);
@@ -96,17 +101,13 @@ b3 = -polyval(polyder(c),Z);
 b = [b1;b2;b3];
 
 vs = A\b;
-Vs = tf([vs(1) vs(2) vs(3) 0],denV,Ts);
+Vs = tf([vs(1) vs(2) vs(3)],denV,Ts);
+% Vs =
+%   -0.1956 z^2 + 0.3752 z - 0.1796
+%   --------------------------------
+%   z^3 - 2.97 z^2 + 2.94 z - 0.9703
 
-
-% Computing S(z)
-S = tf([conv(G1aNum,V.den{1}) zeros(1,d)] - [zeros(1,d) conv(V.num{1},G1z.num{1})],...
-       [conv(G1z.den{1},V.den{1}) zeros(1,d)],Ts);
-S = minreal(S);
-
-Vs = tf([3.123 -6.237 3.114 0],denV,Ts)
 % V = Vs;
-F = tf([0.0054 0 0],conv([1 -0.99],[1 -0.99]),Ts);
 
 S = phiS + Vs*z^-d;
 S = minreal(S);
@@ -115,7 +116,15 @@ numS = S.num{1};
 denS = S.den{1};
 
 Z = 1;
-polyval(numS,1)/polyval(denS,1)
+disp(polyval(numS,Z)/polyval(denS,Z))
+
+% nS = [0 0.110050167084179 -0.434399163324191 0.643004502517625 -0.423011323349226 0.104355819571613 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.00612126048742635 -0.0186592261379670 0.0189537733136556 -0.00641581016311494 0];
+% dS = [1 -4.98005016708417 9.92019916332415 -9.88029850251756 4.92020017334918 -0.980050667071602 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+% S  = tf(nS,dS,Ts);
+% nV = [3.123305087393900 -6.237194887716494 3.113914675530637 0];
+% dV = [1 -2.970000000000000 2.940300000000001 -0.970299000000001];
+% V  = tf(nV,dV,Ts);
+% F  = tf([0.0054 0 0],conv([1 -0.99],[1 -0.99]),Ts)/2.15;
 
 % Call simulation
 sim('Torrico2019SimuEx3')
