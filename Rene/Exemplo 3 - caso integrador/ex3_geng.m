@@ -182,106 +182,106 @@ sim('sim1_nonmininumS')
 
 
 %%
-% robustez
-X2 = log10(pi/Ts);
-X1 = -2;
-N = 100;
-
-w = logspace(X1, X2, N);
-jw = w*sqrt(-1);
-
-zw= exp(jw*Ts);
-
-for i = 1:length(zw)
-    
-
-    Gdw = freqresp(Gd,w(i));
-    Vw = freqresp(V,w(i));
-    dPw(i) = abs(freqresp(dP,w(i))-1);
-
-Ir_bis(i) = abs((1+K*inv(zw(i)*eye(length(A))-A)*B)/(Gdw*Vw));
-end
-
-ex3_liu_geso
-
-f1 = figure;
-subplot(2,1,1)
-%plot(t,y,t,yliu,'r--','linewidth',2)
-plot(t,yliu,'linewidth',2)
-hold on
-plot(t,y,'r','linewidth',1)
-
-axis([0 Tsim -0.05 0.25])
-
-set(gca,'FontName','Times New Roman','FontSize',12)
-leg1 = legend({'Geng et al. [17]','Proposed'},'FontName','Times New Roman','FontSize',12,'location','best');
-set(leg1(1),'Interpreter','latex');
-grid
-xlabel('Time (s)','Interpreter','latex')
-ylabel('Output','Interpreter','latex')
-
-
-
-subplot(2,1,2)
-
-%plot(t,u,t,uliu,'r--','linewidth',2)
-plot(t,uliu,'linewidth',2)
-hold on
-plot(t,u,'r','linewidth',1)
-axis([0 Tsim -0.15 0.25])
-
-set(gca,'FontName','Times New Roman','FontSize',12)
-%legend({'Proposed','Geng et al. [XX]'},'FontName','Times New Roman','FontSize',14,'location','best')
-grid
-xlabel('Time (s)','Interpreter','latex')
-ylabel('Control Input','Interpreter','latex')
-
-%Position: [403 246 560 420]
-set(f1,'Position',[100 66 560 600])
-set(f1,'Units','Inches');
-pos = get(f1,'Position');
-set(f1,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(f1,'ex3_nom','-dpdf','-r0')
-% print(f1,'ex3_perturbed','-dpdf','-r0')
-
-f2 = figure(2);
-loglog(w,Ir_geng,'linewidth',2)
-hold on
-loglog(w,Ir_bis,'r','linewidth',1)
-
-loglog(w,dPw,'k--','linewidth',2)
-%loglog(w,Ir_bis,w,Ir_geng,w,dPw)
-
-
-set(gca,'FontName','Times New Roman','FontSize',12)
-%set(gca(1),'DisplayName','Proposed');
-
-leg2 = legend({'Geng et al. [17]','Proposed','$\overline{\delta P}$'},'FontName','Times New Roman','FontSize',12,'location','best');
-set(leg2(1),'Interpreter','latex');
-
-%legend({'Proposed','Geng et al. [XX]','$\overline{\delta P}'},'Interpreter','Latex','FontName','Times New Roman','FontSize',14,'location','best')
-
-%legend({'$\overline{\delta P}$'},'Interpreter','latex');
-
-grid
-xlabel('Frequency $\omega$ (rad/s)','Interpreter','latex')
-ylabel('Robustness Index $I_r$','interpreter','Latex')
-
-axis([0.01 pi/Ts 0.1 100])
-set(f2,'Units','Inches');
-pos = get(f2,'Position');
-set(f2,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(f2,'ex3_robustness','-dpdf','-r0')
-
-% Indices calculation
-e = 0.2 - y;
-eliu = 0.2 - yliu;
-
-IAE = trapz(abs(e(Tpert/Ts:Truido/Ts)))*Ts
-IAEgeng = trapz(abs(eliu(Tpert/Ts:Truido/Ts)))*Ts
-
-TV = sum(abs(diff(u(Tpert/Ts:Truido/Ts))))
-TVgeng = sum(abs(diff(uliu(Tpert/Ts:Truido/Ts))))
-
-Var = var(u(Truido/Ts:end))
-Vargeng = var(uliu(Truido/Ts:end))
+% % robustez
+% X2 = log10(pi/Ts);
+% X1 = -2;
+% N = 100;
+% 
+% w = logspace(X1, X2, N);
+% jw = w*sqrt(-1);
+% 
+% zw= exp(jw*Ts);
+% 
+% for i = 1:length(zw)
+%     
+% 
+%     Gdw = freqresp(Gd,w(i));
+%     Vw = freqresp(V,w(i));
+%     dPw(i) = abs(freqresp(dP,w(i))-1);
+% 
+% Ir_bis(i) = abs((1+K*inv(zw(i)*eye(length(A))-A)*B)/(Gdw*Vw));
+% end
+% 
+% ex3_liu_geso
+% 
+% f1 = figure;
+% subplot(2,1,1)
+% %plot(t,y,t,yliu,'r--','linewidth',2)
+% plot(t,yliu,'linewidth',2)
+% hold on
+% plot(t,y,'r','linewidth',1)
+% 
+% axis([0 Tsim -0.05 0.25])
+% 
+% set(gca,'FontName','Times New Roman','FontSize',12)
+% leg1 = legend({'Geng et al. [17]','Proposed'},'FontName','Times New Roman','FontSize',12,'location','best');
+% set(leg1(1),'Interpreter','latex');
+% grid
+% xlabel('Time (s)','Interpreter','latex')
+% ylabel('Output','Interpreter','latex')
+% 
+% 
+% 
+% subplot(2,1,2)
+% 
+% %plot(t,u,t,uliu,'r--','linewidth',2)
+% plot(t,uliu,'linewidth',2)
+% hold on
+% plot(t,u,'r','linewidth',1)
+% axis([0 Tsim -0.15 0.25])
+% 
+% set(gca,'FontName','Times New Roman','FontSize',12)
+% %legend({'Proposed','Geng et al. [XX]'},'FontName','Times New Roman','FontSize',14,'location','best')
+% grid
+% xlabel('Time (s)','Interpreter','latex')
+% ylabel('Control Input','Interpreter','latex')
+% 
+% %Position: [403 246 560 420]
+% set(f1,'Position',[100 66 560 600])
+% set(f1,'Units','Inches');
+% pos = get(f1,'Position');
+% set(f1,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+% print(f1,'ex3_nom','-dpdf','-r0')
+% % print(f1,'ex3_perturbed','-dpdf','-r0')
+% 
+% f2 = figure(2);
+% loglog(w,Ir_geng,'linewidth',2)
+% hold on
+% loglog(w,Ir_bis,'r','linewidth',1)
+% 
+% loglog(w,dPw,'k--','linewidth',2)
+% %loglog(w,Ir_bis,w,Ir_geng,w,dPw)
+% 
+% 
+% set(gca,'FontName','Times New Roman','FontSize',12)
+% %set(gca(1),'DisplayName','Proposed');
+% 
+% leg2 = legend({'Geng et al. [17]','Proposed','$\overline{\delta P}$'},'FontName','Times New Roman','FontSize',12,'location','best');
+% set(leg2(1),'Interpreter','latex');
+% 
+% %legend({'Proposed','Geng et al. [XX]','$\overline{\delta P}'},'Interpreter','Latex','FontName','Times New Roman','FontSize',14,'location','best')
+% 
+% %legend({'$\overline{\delta P}$'},'Interpreter','latex');
+% 
+% grid
+% xlabel('Frequency $\omega$ (rad/s)','Interpreter','latex')
+% ylabel('Robustness Index $I_r$','interpreter','Latex')
+% 
+% axis([0.01 pi/Ts 0.1 100])
+% set(f2,'Units','Inches');
+% pos = get(f2,'Position');
+% set(f2,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+% print(f2,'ex3_robustness','-dpdf','-r0')
+% 
+% % Indices calculation
+% e = 0.2 - y;
+% eliu = 0.2 - yliu;
+% 
+% IAE = trapz(abs(e(Tpert/Ts:Truido/Ts)))*Ts
+% IAEgeng = trapz(abs(eliu(Tpert/Ts:Truido/Ts)))*Ts
+% 
+% TV = sum(abs(diff(u(Tpert/Ts:Truido/Ts))))
+% TVgeng = sum(abs(diff(uliu(Tpert/Ts:Truido/Ts))))
+% 
+% Var = var(u(Truido/Ts:end))
+% Vargeng = var(uliu(Truido/Ts:end))
