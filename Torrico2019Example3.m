@@ -49,7 +49,7 @@ F = minreal(Kr*(1-betaf)^2*z^2/(z-betaf)^2*(1-alphaf*z^-1)^nz/(1-alphaf)^nz);
 
 nG    = G1z.num{1}   ;
 dG    = G1z.den{1}   ;
-denV  = conv(conv([1 -beta1],[1 -beta2]),[1 -beta3]);
+dV  = conv(conv([1 -beta1],[1 -beta2]),[1 -beta3]);
 
 Ng_p1 = polyval(nG,p(1));
 Ng_p2 = polyval(nG,p(2));
@@ -57,7 +57,7 @@ Ng_p2 = polyval(nG,p(2));
 Nga_p1 = polyval(nGa,p(1));
 Nga_p2 = polyval(nGa,p(2));
 
-nAux = conv(conv(denV,nGa+dG),eye(1,d+1));
+nAux = conv(conv(dV,nGa+dG),eye(1,d+1));
 dAux = nG;
 
 numD = conv(polyder(nAux),dAux) - conv([0 polyder(dAux)],nAux);
@@ -69,9 +69,9 @@ A_v = [       1      1    1
 B_v = [Kr*(1-beta1)^3
        Nga_p1*p(1)^d*(p(1)-beta1)^3/Ng_p1
        polyval(numD,p(2))/polyval(denD,p(2))];
-v = A_v\B_v
+v = A_v\B_v;
 
-V = tf([v(1) v(2) v(3) 0],denV,Ts)
+V = tf([v(1) v(2) v(3) 0],dV,Ts);
 
 phiS = 0;
 for i = 1:d
@@ -79,25 +79,28 @@ for i = 1:d
 end
 phiS = minreal(phiS);
 [numPhiS,denPhiS] = tfdata(phiS,'v');
-
+% phiS =
+% [0 0.110050167084177 0.113656189651013 0.117298453347156 0.120977322402008 0.124693164705538 0.128446351845067 0.132237259142459 0.136066265691596 0.139933754396320 0.143840112008705 0.147785729167798 0.151771000438591 0.155796324351520 0.159862103442334 0.163968744292403 0.168116657569141 0.172306258067312 0.176537964750534 0.180812200793002 0.185129393621772]
 numPhiS(1) = 1;
-c = conv(numPhiS,denV);
+c = conv(numPhiS,dV);
+% cc=(minreal(phiS*z^20)+z^20)*tf(dV,1,Ts);
+% c = cc.num{1};
+Aa = [     1   1   1
+      p(1)^2 p(1)  1
+           2   1   0];
 
-Aa = [       1      1    1
-        p(1)^3 p(1)^2  p(1)
-         3*1^2    2*1    1];
-
-Z = 1;
+Z  = 1;
 b1 = -polyval(c,Z);
-Z = p(1);
+Z  = p(1);
 b2 = -polyval(c,Z);
-Z = 1;
+Z  = 1;
 b3 = -polyval(polyder(c),Z);
 
 b = [b1;b2;b3];
-
-vs = Aa\b;
-Vs = tf([vs(1) vs(2) vs(3)],denV,Ts);
+format long g
+vs = Aa\b
+vs = [-0.195611237552691 0.375246034389618 -0.179630867552097];
+Vs = tf([vs(1) vs(2) vs(3)],dV,Ts)
 % Vs =
 %   -0.1956 z^2 + 0.3752 z - 0.1796
 %   --------------------------------
@@ -105,7 +108,7 @@ Vs = tf([vs(1) vs(2) vs(3)],denV,Ts);
 
 % V = Vs;
 
-S = phiS + Vs*z^-d;
+S = phiS - Vs*z^-d;
 S = minreal(S);
 
 numS = S.num{1};

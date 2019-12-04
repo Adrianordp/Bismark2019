@@ -45,7 +45,6 @@ Gd2 = ss(A,B,eye(2),[0;0],Ts)
 p1 = 0.95;
 p2 = 0.95;
 
-
 a1 = 0.99;
 a2 = a1;
 a3 = a1;
@@ -135,7 +134,7 @@ for q = 1:5
     Bb = [Bb;[polyval(nG,x)*polyval(nV,x)]];
 end
 
-aux = Ab\Bb; 
+aux = Ab\Bb;
 Nv_ = aux(3:end)'
 Ng_ = aux(1:2)';
 
