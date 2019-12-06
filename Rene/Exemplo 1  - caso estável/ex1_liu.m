@@ -13,7 +13,7 @@ Ts = 0.1;
 
 wn = 20;
 xi = 0.25;
-Pr = G*exp(-1.25*s)*(wn^2/(s^2+2*xi*s*wn+wn^2)) % Planta com incerteza
+Pr = G*exp(-1.25*s)*(wn^2/(s^2+2*xi*s*wn+wn^2)); % Planta com incerteza
 Pr = G*exp(-s);                                  % Sem incerteza
 
 dP = exp(-0.25*s)*(wn^2/(s^2+2*xi*s*wn+wn^2))%       incerteza multiplicativa

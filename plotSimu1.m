@@ -22,7 +22,7 @@ hy.Position = [-1066 506 895 385];
 hu = figure;              % Initialize figure frame
 plot(t,u,'LineWidth',2)   % Plot curves
 grid on                   % Enable grid
-axis([min(t) max(t) 2.6]) % Limit axes
+axis([min(t) max(t) 0 2.6]) % Limit axes
 % Name labels
 xlabel('Time [sample]')
 ylabel('u(t)')
