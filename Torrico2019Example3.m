@@ -9,6 +9,7 @@ distAmp    =-0.06; % Dirtubance amplitude
 noiseTime  = 35  ; % Noise input time
 noisePower = 1e-8; % Noise input power
 refAmp     = 0.2 ; % Reference
+uLim       = 90.15;
 
 % System
 P1s = (1-0.2*s)/s/(s-1)*exp(-0.2*s);
@@ -28,20 +29,24 @@ buff = B'  ;
 B    = C'  ;
 C    = buff;
 
+Gss = ss(A,B,C,D,Ts);
+
 % Pole definition
-p1    = 0.95; % p1 = 0.9;
+p1    = 0.98; % p1 = 0.9;
 p2    = p1  ; % p2 = 0.85;
 beta  = [p1 p2];
 alphaf= 0.00;
-betaf = 0.994; % 0.99 no artigo
-beta1 = 0.99;
-beta2 = 0.99;
-beta3 = 0.99;
+betaf = 0.994; % 0.99 no artigo, 0.94 real
+beta1 = 0.970;
+beta2 = 0.970;
+beta3 = 0.970;
 p     = roots(P1z.den{1}); % rounded open-loop poles
 nz    = 2;
 
 % Control gain
 K = acker(A,B,beta); % K = [110.0255 101.6672];
+% Q = eye(2); R = .1;
+% K = lqr(Gss,Q,R)
 
 % Reference filter
 Kr = 1/(C/(eye(size(A))+B*K-A)*B);
@@ -68,8 +73,8 @@ denD = conv(dAux,dAux);
 A_v = [       1      1    1
          p(1)^3 p(1)^2  p(1)
        3*p(2)^2  2*p(2)   1];
-B_v = [Kr*(1-beta1)^3
-       Nga_p1*p(1)^d*(p(1)-beta1)^3/Ng_p1
+B_v = [Kr*(1-beta1)*(1-beta2)*(1-beta3)
+       Nga_p1*p(1)^d*(p(1)-beta1)*(p(1)-beta2)*(p(1)-beta3)/Ng_p1
        polyval(numD,p(2))/polyval(denD,p(2))];
 v = A_v\B_v;
 
@@ -81,8 +86,8 @@ for i = 1:d
     phiS = phiS + K*A^(i-1)*B*z^-i;
 end
 phiS = minreal(phiS);
-x = [1 p1 beta1 rand(1,2)];
-% x = rand(1,5);
+% x = [1 p1 beta1 rand(1,2)];
+x = rand(1,5);
 Aa = zeros(5);
 b  = zeros(5,1);
 for i = 1:5
