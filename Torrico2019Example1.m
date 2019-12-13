@@ -3,9 +3,9 @@ s = tf('s');
 
 % Example 1 ---------------------------------------------------------------
 % Simulation parameters
-Tsim       = 60     ; % Total time
-noiseTime  = 55     ; % Noise input time
-noisePower = 0.00001; % Noise input power
+Tsim       = 60  ; % Total time
+noiseTime  = 55  ; % Noise input time
+noisePower = 1e-5; % Noise input power
 
 % System
 P1s = (-s+1)/(2*s+1)/(3*s+1)*exp(-s);
