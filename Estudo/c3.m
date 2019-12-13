@@ -5,19 +5,19 @@ s = tf('s');
 
 % Example 3 ---------------------------------------------------------------
 % Simulation parameters
-Tsim       = 100 ; % Total time
-distTime   = 40 ; % Dirtubance time
-distAmp    =-0.2; % Dirtubance amplitude
-noiseTime  = 80  ; % Noise input time
-noisePower = 1e-5; % Noise input power
-refAmp     = 1   ; % Reference
+Tsim       = 100  ; % Total time
+distTime   = 40   ; % Dirtubance time
+distAmp    =-0.2  ; % Dirtubance amplitude
+noiseTime  = 80   ; % Noise input time
+noisePower = 1e-4 ; % Noise input power
+refAmp     = 1    ; % Reference
 uLim       = 90.15;
 
 % System
-% P1s = (-s+1)/(2*s+1)/(3*s+1)*exp(-s);
-% G1s = (-s+1)/(2*s+1)/(3*s+1);
-P1s = (1)/(2*s+1)/(3*s+1)*exp(-s);
-G1s = (1)/(2*s+1)/(3*s+1);
+P1s = (-s+1)/(2*s+1)/(3*s+1)*exp(-s);
+G1s = (-s+1)/(2*s+1)/(3*s+1);
+% P1s = (1)/(2*s+1)/(3*s+1)*exp(-s);
+% G1s = (1)/(2*s+1)/(3*s+1);
 % P1s = (1-0.2*s)/s/(s-1)*exp(-0.2*s);
 % G1s = (1-0.2*s)/s/(s-1);
 
@@ -40,13 +40,13 @@ Gss = ss(A,B,C,D,Ts);
 % Pole definition
 p      = roots(Pr.den{1}); % open-loop poles
 ze     = roots(Pr.num{1});
-r1     = 0.975;
-r2     = 0.970;
+r1     = 0.968;
+r2     = 0.98;
 rho    = [r1 r2];
-alphaf = 0.000;
+alphaf = 0.95;
 betaf  = 0.9;
-betav  = .9;
-betasv = .95;
+betav  = .950;
+betasv = .965;
 nz     = 2;
 
 % Control gain
@@ -101,9 +101,9 @@ Vs = tf([v(1) v(2)],dVs,Ts)
 V  = tf([v(3) v(4)],dV,Ts)
 
 S   = phi-Vs*z^-d;
-S = minreal(S);
-Ceq = V/(S+1);
-YR  = minreal(Pr*Kr/(Pr*V+S+1));
+S   = minreal(S);
+Ceq = 1/(S+1);
+YR  = series(feedback(series(Ceq,Pr),V),Kr);
 zpk(YR)
 if (evalfr(V,1)-Kr < 1e-10)
     disp('V(1) == Kr, ok!')

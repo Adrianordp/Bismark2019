@@ -4,10 +4,22 @@
 % Close figures
 close all
 
+% Plot u(t)
+figure                      % Initialize figure frame
+plot(t,u,'LineWidth',2)     % Plot curves
+axis([min(t) max(t) 0 1.4]) % Limit axes
+% Name labels
+xlabel('Time [sample]')
+ylabel('u(t)')
+title('u(t)')
+legend('u(t)')
+hu = gcf;
+hu.Position = [-867 337 892 396];
+grid on                     % Enable grid
+
 % Plot y(t)
 figure                     % Initialize figure frame
 plot(t,r,'LineWidth',2)    % Plot curves
-grid on                    % Enable grid
 hold on
 plot(t,y,'LineWidth',2)
 axis([min(t) max(t) -.05 1.2]) % Limit axes
@@ -17,17 +29,6 @@ ylabel('y(t)')
 title('y(t)')
 legend('r(t)','y(t)')
 hy = gcf;
-hy.Position = [-1065 524 892 396];
-
-% Plot u(t)
-figure                      % Initialize figure frame
-plot(t,u,'LineWidth',2)     % Plot curves
-grid on                     % Enable grid
-axis([min(t) max(t) 0 1.4]) % Limit axes
-% Name labels
-xlabel('Time [sample]')
-ylabel('u(t)')
-title('u(t)')
-legend('u(t)')
-hu = gcf;
-hu.Position = [-1065 524 892 396];
+hy.Position = [-1368 601 892 396];
+step(P1s,Tsim)
+grid on                    % Enable grid

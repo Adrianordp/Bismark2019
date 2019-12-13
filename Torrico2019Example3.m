@@ -110,6 +110,13 @@ S = minreal(S);
 numS = S.num{1};
 denS = S.den{1};
 
+[zz,pp,kk] = zpkdata(S,'v');
+[nSt,dSt] = zp2tf(zz(1:21),pp,kk);
+% [nSt,dSt] = zp2tf(zz(end-20:end),pp,kk);
+St = tf(nSt,dSt,Ts);
+Sb = S;
+S = St;
+
 % Call simulation
 sim('Torrico2019SimuEx3')
 
