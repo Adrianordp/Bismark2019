@@ -10,7 +10,7 @@ plot(t,r,'LineWidth',2)    % Plot curves
 grid on                    % Enable grid
 hold on
 plot(t,y,'LineWidth',2)
-axis([min(t) max(t) -.05 0.25]) % Limit axes
+axis([min(t) max(t) -.05 1.2]) % Limit axes
 % Name labels
 xlabel('Time [sample]')
 ylabel('y(t)')
@@ -23,7 +23,7 @@ hy.Position = [-1065 524 892 396];
 figure                      % Initialize figure frame
 plot(t,u,'LineWidth',2)     % Plot curves
 grid on                     % Enable grid
-axis([min(t) max(t) 0 .3]) % Limit axes
+axis([min(t) max(t) 0 1.4]) % Limit axes
 % Name labels
 xlabel('Time [sample]')
 ylabel('u(t)')

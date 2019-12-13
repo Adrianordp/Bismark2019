@@ -5,26 +5,28 @@ s = tf('s');
 
 % Example 3 ---------------------------------------------------------------
 % Simulation parameters
-Tsim       = 80 ; % Total time
-distTime   = 30 ; % Dirtubance time
-distAmp    =-0.06; % Dirtubance amplitude
-noiseTime  = 60  ; % Noise input time
-noisePower = 1e-6; % Noise input power
-refAmp     = 0.2 ; % Reference
+Tsim       = 100 ; % Total time
+distTime   = 40 ; % Dirtubance time
+distAmp    =-0.2; % Dirtubance amplitude
+noiseTime  = 80  ; % Noise input time
+noisePower = 1e-5; % Noise input power
+refAmp     = 1   ; % Reference
 uLim       = 90.15;
 
 % System
-P1s = 1/(s+1)^2*exp(-1*s);
-G1s = 1/(s+1)^2;
+% P1s = (-s+1)/(2*s+1)/(3*s+1)*exp(-s);
+% G1s = (-s+1)/(2*s+1)/(3*s+1);
+P1s = (1)/(2*s+1)/(3*s+1)*exp(-s);
+G1s = (1)/(2*s+1)/(3*s+1);
 % P1s = (1-0.2*s)/s/(s-1)*exp(-0.2*s);
 % G1s = (1-0.2*s)/s/(s-1);
 
 % Discretization
-Ts  = 0.1           ;
-z   = tf('z',Ts)    ;
-Pr  = c2d(P1s,Ts)   ;
+Ts  = 0.1          ;
+z   = tf('z',Ts)   ;
+Pr  = c2d(P1s,Ts)  ;
 d   = Pr.InputDelay;
-G1z = c2d(G1s,Ts)   ;
+G1z = c2d(G1s,Ts)  ;
 
 % Space-state system (must be a observable cannonical form)
 [A,B,C,D] = tf2ss(Pr.num{1},Pr.den{1});
@@ -36,14 +38,15 @@ C    = buff;
 Gss = ss(A,B,C,D,Ts);
 
 % Pole definition
-r1     = 0.953;
-r2     = 0.955;
+p      = roots(Pr.den{1}); % open-loop poles
+ze     = roots(Pr.num{1});
+r1     = 0.975;
+r2     = 0.970;
 rho    = [r1 r2];
 alphaf = 0.000;
-betaf  = 0.92; % 0.99 no artigo, 0.94 real
-betav  = 0.75;
-betasv = 0.85;
-p      = roots(Pr.den{1}); % open-loop poles
+betaf  = 0.9;
+betav  = .9;
+betasv = .95;
 nz     = 2;
 
 % Control gain
@@ -100,7 +103,8 @@ V  = tf([v(3) v(4)],dV,Ts)
 S   = phi-Vs*z^-d;
 S = minreal(S);
 Ceq = V/(S+1);
-YR  = Pr*Kr/(Pr*V+S+1);
+YR  = minreal(Pr*Kr/(Pr*V+S+1));
+zpk(YR)
 if (evalfr(V,1)-Kr < 1e-10)
     disp('V(1) == Kr, ok!')
 else
@@ -125,6 +129,7 @@ end
 disp(max(abs(pp)))
 if(max(abs(pp))>=1)
     disp('There is a pole outside the unitary circle!')
+else
+    % Call simulation
+    sim('simuC3')
 end
-% Call simulation
-sim('simuC3')
