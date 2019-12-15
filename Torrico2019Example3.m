@@ -86,19 +86,21 @@ for i = 1:d
     phiS = phiS + K*A^(i-1)*B*z^-i;
 end
 phiS = minreal(phiS);
-% x = [1 p1 beta1 rand(1,2)];
 x = rand(1,5);
-Aa = zeros(5);
-b  = zeros(5,1);
-for i = 1:5
+% x = rand(1,4);
+% x = [beta1 beta2 beta3];
+Nx = length(x);
+Aa = zeros(Nx);
+b  = zeros(Nx,1);
+for i = 1:Nx
     dGZ = polyval(dG,x(i));
     dVZ = polyval(dV,x(i));
     nGZ = polyval(nG,x(i));
     nVZ = polyval(nV,x(i));
     Aa(i,:) = [[x(i)^2 x(i) 1]*dGZ [x(i) 1]*dVZ];
+%     Aa(i,:) = [x(i)^2 x(i) 1]*dGZ;
     b(i) = nGZ*nVZ;
 end
-
 format long g
 vs = Aa\b
 

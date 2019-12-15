@@ -24,7 +24,7 @@ B = C';
 C = buff;
 
 % Pole definition
-beta   = [0.92 0.92]; % Desirable poles for closed loop system
+beta   = [0.91 0.92]; % Desirable poles for closed loop system
 alphaf = 0.00       ; % Reference filter (zero)
 betaf  = 0.89       ; % Reference filter (pole)
 beta1  = 0.90       ; % Robustness filter tunning
