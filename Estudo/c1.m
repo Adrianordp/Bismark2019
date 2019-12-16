@@ -87,7 +87,7 @@ end
 phi = minreal(phi);
 Nr  = nNvs+nNv-Nrho-Np;
 
-x  = [1 p 0.8114];
+x  = [1 p 0.8114*0];
 Nx = length(x);
 Av = zeros(Nx,nNv+nNvs+2);
 Bv = zeros(Nx,1);
@@ -123,33 +123,33 @@ for i = 1:Nx
     end
 end
 Avb = Av;
-Av = Av(1:3,3:5);
-% Av = Av(:,3:6);
-% Av(4,:) = [1 -1 1 -1];
-Bv = Bv(1:end-1)
-% Bv = Bv(1:end);
-% Bv(4) = 0;
+% Av = Av(1:3,3:5);
+Av = Av(:,3:6);
+Av(4,:) = [1 -1 1 -1];
+% Bv = Bv(1:end-1)
+Bv = Bv(1:end);
+Bv(4) = 0;
 v = Av\Bv;
-numV  = [v' 0];
-% numV  = v';
+% numV  = [v' 0];
+numV  = v';
 % Vs = tf(numVs,denVs,Ts);
 V  = tf(numV,denV,Ts);
 %        5.155 z^2 - 9.848 z + 4.704
 % V = ---------------------------------
 %     z^3 - 2.54 z^2 + 2.142 z - 0.5994
 
-x  = rand(1,5);
+x1  = rand(1,5);
 % x = rand(1,4);
 % x = [beta1 beta2 beta3];
-Nx = length(x);
+Nx = length(x1);
 Aa = zeros(Nx);
 b  = zeros(Nx,1);
 for i = 1:Nx
-    dGZ = polyval(dG,x(i));
-    dVZ = polyval(denV,x(i));
-    nGZ = polyval(nG,x(i));
-    nVZ = polyval(numV,x(i));
-    Aa(i,:) = [[x(i)^2 x(i) 1]*dGZ [x(i) 1]*dVZ];
+    dGZ = polyval(dG,x1(i));
+    dVZ = polyval(denV,x1(i));
+    nGZ = polyval(nG,x1(i));
+    nVZ = polyval(numV,x1(i));
+    Aa(i,:) = [[x1(i)^2 x1(i) 1]*dGZ [x1(i) 1]*dVZ];
 %     Aa(i,:) = [x(i)^2 x(i) 1]*dGZ;
     b(i) = nGZ*nVZ;
 end
@@ -194,10 +194,10 @@ if(max(abs(pp))>=1)
     eFlag = true;
 end
 % eFlag = false;
-% if ~eFlag
-%     % Call simulation
-%     sim('simuC1')
-% end
+if ~eFlag
+    % Call simulation
+    sim('simuC1')
+end
 
 clear j
 w  = logspace(-2,1.5,100);
