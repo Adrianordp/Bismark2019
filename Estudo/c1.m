@@ -36,18 +36,18 @@ Gss = ss(A,B,C,D,Ts);
 % Pole definition
 p      = roots(Pr.den{1}); % open-loop poles
 ze     = roots(Pr.num{1});
-r1     = .975; % .975
-r2     = .97; % .97
+r1     = .91; % .975
+r2     = .92; % .97
 rho    = [r1; r2];
 alphaf = .0; % .95
 betaf  = .90; % .90
-betav  = [.8 .8 .74]; % .95
+betav  = [.9 .9 .74]; % .95
 betavs = [.9 .9 .74]; % .965
 nz     = 2;
 nDv    = length(betav);
 nDvs   = length(betavs);
-nNv    = 1;
-nNvs   = 1;
+nNv    = 3;
+nNvs   = 2;
 
 % Control gain
 K = acker(A,B,rho);
@@ -69,7 +69,6 @@ dVs = 1;
 for i = 1:nDvs
     dVs = conv(dVs,[1 -betavs(i)]);
 end
-% dVs = tf(dVs,1,Ts);
 
 Ng_p1 = polyval(nG,p(1));
 Ng_p2 = polyval(nG,p(2));
@@ -86,7 +85,8 @@ NN   = nNv+nNvs+2;
 Nrho = length(rho);
 Nr   = NN-Nrho-2;
 % Nr   = 0;
-x    = [rho; rand(Nr,1)*.2+.8; 1; 1];
+% x    = [rho; rand(Nr,1); 1; 1];
+x    = [rho; .2; 0.1; 1; 1];
 Nx   = length(x);
 Av   = zeros(Nx,NN);
 Bv   = zeros(Nx,1);
@@ -121,7 +121,7 @@ for i = 1:Nx
             Av(i,j+nNvs+1) = x(i)^(nNv-j+1);
         end
         Av(i,nNvs+2:end) = -evalfr(Pr,x(i))*Av(i,nNvs+2:end)/evalfr(Pi,x(i));
-        Bv(i) = evalfr(phi,x(i))-evalfr(Gs,x(i));
+        Bv(i) = evalfr(phi,x(i)) - evalfr(Gs,x(i));
     elseif i == Nrho+Nr+1
         Av(i,:) = [ones(1,nNvs+1) zeros(1,nNv+1)];
         Bv(i) = (evalfr(phi,1)+1)*evalfr(Pis,x(i));
@@ -133,8 +133,13 @@ end
 
 v = Av\Bv;
 
-Vs = tf([v(1) v(2)],dVs,Ts)
-V  = tf([v(3) v(4)],dV,Ts)
+nVs = v(1:nNvs+1)';
+nV  = v(nNvs+2:end)';
+Vs = tf(nVs,dVs,Ts)
+V  = tf(nV,dV,Ts)
+% Vs = tf([v(1) v(2)],dVs,Ts)
+% V  = tf([v(3) v(4)],dV,Ts)
+
 
 S   = phi-Vs*z^-d;
 S   = minreal(S);
@@ -158,7 +163,7 @@ for i = 1:Nrho
     if (abs(min(pp-rho(i))) < 1e-4)
         disp(['pole ' num2str(i) ' ok!'])
     else
-        disp(['pole ' num2str(i) ' error!'])
+        disp(['pole ' num2str(i) ' error!' num2str(abs(min(pp-rho(i))))])
     end
 end
 
