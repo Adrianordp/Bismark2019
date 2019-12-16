@@ -87,7 +87,8 @@ end
 phi = minreal(phi);
 Nr  = nNvs+nNv-Nrho-Np;
 
-x  = [1 p];
+% x  = [1 p 0.8114];
+x  = [1 p .8114];
 Nx = length(x);
 Av = zeros(Nx,nNv+nNvs+2);
 Bv = zeros(Nx,1);
@@ -110,6 +111,11 @@ for i = 1:Nx
             Av(i,j+nNvs+1) = x(i)^(nNv-j+1);
         end
         Bv(i) = Kr*evalfr(Pi,x(i));
+    elseif i == Nx
+        for j = 1:nNv+1
+            Av(i,j+nNvs+1) = x(i)^(nNv-j+1);
+        end
+        Bv(i) = Kr*evalfr(Pi,x(i));
     else
         for j = 1:nNv+1
             Av(i,j+nNvs+1) = x(i)^(nNv-j+1);
@@ -117,11 +123,18 @@ for i = 1:Nx
         Bv(i) = evalfr(Pi,x(i))*evalfr(GaG,x(i))*x(i)^d;
     end
 end
-Av = Av(:,3:5);
+Avb = Av;
+Av = Av(1:3,3:5);
+% Av = Av(:,3:6);
+% Av(4,:) = [1 -1 1 -1];
+Bv = Bv(1:end-1)
+% Bv = Bv(1:end);
+% Bv(4) = 0;
 v = Av\Bv;
 numV  = [v' 0];
+% numV  = v';
 % Vs = tf(numVs,denVs,Ts);
-V  = tf(numV ,denV,Ts);
+V  = tf(numV,denV,Ts);
 %        5.155 z^2 - 9.848 z + 4.704
 % V = ---------------------------------
 %     z^3 - 2.54 z^2 + 2.142 z - 0.5994
@@ -151,6 +164,7 @@ S   = minreal(S);
 Ceq = 1/(S+1);
 YR  = series(feedback(series(Ceq,Pr),V),Kr);
 zpk(YR)
+YQ = Pr*(phi-Vs*z^-d+1)/(Pr*V+phi-Vs*z^-d+1);
 if (evalfr(V,1)-Kr < 1e-10)
     disp('V(1) == Kr, ok!')
 else
