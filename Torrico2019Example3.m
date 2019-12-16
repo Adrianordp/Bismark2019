@@ -54,8 +54,8 @@ F = minreal(Kr*(1-betaf)^2*z^2/(z-betaf)^2*(1-alphaf*z^-1)^nz/(1-alphaf)^nz);
 
 [nGa, dGa] = ss2tf(A,B,K,0);
 
-nG    = G1z.num{1}   ;
-dG    = G1z.den{1}   ;
+nG  = G1z.num{1};
+dG  = G1z.den{1};
 dV  = conv(conv([1 -beta1],[1 -beta2]),[1 -beta3]);
 
 Ng_p1 = polyval(nG,p(1));

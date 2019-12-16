@@ -36,28 +36,32 @@ Gss = ss(A,B,C,D,Ts);
 % Pole definition
 p      = roots(Pr.den{1})'; % open-loop poles
 ze     = roots(Pr.num{1});
-r1     = .975; % .975
-r2     = .97; % .97
+r1     = .92; % .975
+r2     = .92; % .97
 rho    = [r1 r2];
-alphaf = .95; % .95
-betaf  = .90; % .90
-betav  = [.964 .965 .966]; % .95
-betavs = [.964 .965 .966]; % .965
-% betavs = [.9 .9 .74]; % .965
+alphaf = .0; % .95
+betaf  = .89; % .89
+betav  = [.9 .9 .74]; % .95
+betavs = [.9 .9 .74]; % .965
 Nrho   = length(rho);
 Np     = length(p);
 nz     = 2;
 nDv    = length(betav);
 nDvs   = length(betavs);
 nNv    = 3;
-nNvs   = 2;
+nNvs   = 1;
 
 % Control gain
 K = acker(A,B,rho);
 
 % Reference filter
 Kr = 1/(C/(eye(size(A))+B*K-A)*B);
+% Kr = 4.0028
 F  = minreal(Kr*(1-betaf)^2*z^2/(z-betaf)^2*(1-alphaf*z^-1)^nz/(1-alphaf)^nz);
+% F = 
+%        0.04843 z^2
+%   ---------------------
+%   z^2 - 1.78 z + 0.7921
 
 [nGa, dGa] = ss2tf(A,B,K,0);
 
@@ -74,11 +78,7 @@ for i = 1:nDvs
     denVs = conv(denVs, [1 -betavs(i)]);
 end
 
-Ng_p1 = polyval(nG,p(1));
-Ng_p2 = polyval(nG,p(2));
-
-Nga_p1 = polyval(nGa,p(1));
-Nga_p2 = polyval(nGa,p(2));
+GaG = tf(nGa,nG,Ts);
 
 phi = 0;
 for i = 1:d
@@ -86,13 +86,8 @@ for i = 1:d
 end
 phi = minreal(phi);
 Nr  = nNvs+nNv-Nrho-Np;
-if Nr < 0
-    error('Aumentar ordem dos polonomios V(z) e V*(z).')
-end
-x  = [rho p 1 1 rand(1,Nr)/2+0.1];
-x(end-1:end) = betavs(1:2);
-N1 = Nrho+Np;
-N2 = N1+2;
+
+x  = [1 p];
 Nx = length(x);
 Av = zeros(Nx,nNv+nNvs+2);
 Bv = zeros(Nx,1);
@@ -110,45 +105,46 @@ end
 Pi = tf(Pi,1,Ts);
 
 for i = 1:Nx
-    if i <= Nrho
-        for j = 1:nNvs+1
-            Av(i,j) = x(i)^(nNvs+1-d-j)/evalfr(Pis,x(i));
-        end
+    if i == 1
         for j = 1:nNv+1
-            Av(i,j+nNvs+1) = -evalfr(Pr,x(i))*x(i)^(nNv-j+1)/evalfr(Pi,x(i));
+            Av(i,j+nNvs+1) = x(i)^(nNv-j+1);
         end
-        Bv(i) = evalfr(phi,x(i))+1;
-    elseif i <= N1
-        for j = 1:nNvs+1
-            Av(i,j) = x(i)^(nNvs+1-d-j);
-        end
-        for j = 1:nNv+1
-            Av(i,j+nNvs+1) = 0;
-        end
-        Bv(i) = (evalfr(phi,x(i))+1)*evalfr(Pis,x(i));
-    elseif i == N1+1
-        Av(i,:) = [ones(1,nNvs+1) zeros(1,nNv+1)];
-        Bv(i) = (evalfr(phi,1)+1)*evalfr(Pis,x(i));
-    elseif i == N1+2
-        Av(i,:) = [zeros(1,nNvs+1) ones(1,nNv+1)];
         Bv(i) = Kr*evalfr(Pi,x(i));
     else
-        for j = 1:nNvs+1
-            Av(i,j) = x(i)^(nNvs+1-j);
-        end
         for j = 1:nNv+1
-            Av(i,nNvs+1+j) = -evalfr(G1z,x(i))*x(i)^(nNv+1-j);
+            Av(i,j+nNvs+1) = x(i)^(nNv-j+1);
         end
+        Bv(i) = evalfr(Pi,x(i))*evalfr(GaG,x(i))*x(i)^d;
     end
 end
-% Av = Av(3:end,:);
-% Bv = Bv(3:end);
+Av = Av(:,3:5);
 v = Av\Bv;
-% v = pinv(Av)*Bv;
-numVs = v(1:nNvs+1)';
-numV  = v(nNvs+2:end)';
-Vs = tf(numVs,denVs,Ts);
+numV  = [v' 0];
+% Vs = tf(numVs,denVs,Ts);
 V  = tf(numV ,denV,Ts);
+%        5.155 z^2 - 9.848 z + 4.704
+% V = ---------------------------------
+%     z^3 - 2.54 z^2 + 2.142 z - 0.5994
+
+x  = rand(1,5);
+% x = rand(1,4);
+% x = [beta1 beta2 beta3];
+Nx = length(x);
+Aa = zeros(Nx);
+b  = zeros(Nx,1);
+for i = 1:Nx
+    dGZ = polyval(dG,x(i));
+    dVZ = polyval(denV,x(i));
+    nGZ = polyval(nG,x(i));
+    nVZ = polyval(numV,x(i));
+    Aa(i,:) = [[x(i)^2 x(i) 1]*dGZ [x(i) 1]*dVZ];
+%     Aa(i,:) = [x(i)^2 x(i) 1]*dGZ;
+    b(i) = nGZ*nVZ;
+end
+
+vs = Aa\b;
+
+Vs = tf([vs(1) vs(2) vs(3)],denV,Ts);
 
 S   = phi-Vs*z^-d;
 S   = minreal(S);
@@ -162,10 +158,10 @@ else
 end
 
 eFlag = false;
-if (evalfr(phi-Vs+1,1) < 1e-9)
+if (evalfr(S+1,1) < 1e-9)
     disp('Ceq(1) == inf, ok!')
 else
-    disp(['Ceq(1) =/= inf, error! ' num2str(evalfr(phi-Vs+1,1))])
+    disp(['Ceq(1) =/= inf, error! ' num2str(evalfr(S+1,1))])
 %     eFlag = true;
 end
 
