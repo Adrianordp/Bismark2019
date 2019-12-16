@@ -39,7 +39,7 @@ ze     = roots(Pr.num{1});
 r1     = .92; % .975
 r2     = .92; % .97
 rho    = [r1 r2];
-alphaf = .0; % .95
+alphaf = .00; % .95
 betaf  = .89; % .89
 betav  = [.9 .9 .74]; % .95
 betavs = [.9 .9 .74]; % .965
@@ -87,8 +87,7 @@ end
 phi = minreal(phi);
 Nr  = nNvs+nNv-Nrho-Np;
 
-% x  = [1 p 0.8114];
-x  = [1 p .8114];
+x  = [1 p 0.8114];
 Nx = length(x);
 Av = zeros(Nx,nNv+nNvs+2);
 Bv = zeros(Nx,1);
@@ -195,7 +194,38 @@ if(max(abs(pp))>=1)
     eFlag = true;
 end
 % eFlag = false;
-if ~eFlag
-    % Call simulation
-    sim('simuC1')
+% if ~eFlag
+%     % Call simulation
+%     sim('simuC1')
+% end
+
+clear j
+w  = logspace(-2,1.5,100);
+Nw = length(w);
+P  = zeros(Nw,1);
+for i = 1:Nw
+    ejw = exp(j*w(i)*Ts);
+    P(i) = abs(1+K*((ejw*eye(size(A))-A)\B))/abs(freqresp(V,w(i))*freqresp(G1z,w(i)));
 end
+figure, loglog(w,P)
+grid on
+
+IR = gcf;
+IR.Children.YLim = [.10 100];
+IR.Children.XLim = [.01 10^1.5];
+IR.Position = [-930 495 576 429];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
