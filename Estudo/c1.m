@@ -1,6 +1,6 @@
 % Adriano, Aloísio, Ítalo, Judá e Nickson
 reseta, format short g
-
+load t1.mat
 s = tf('s');
 
 % Example 3 ---------------------------------------------------------------
@@ -36,13 +36,13 @@ Gss = ss(A,B,C,D,Ts);
 % Pole definition
 p      = roots(Pr.den{1}); % open-loop poles
 ze     = roots(Pr.num{1});
-r1     = .91; % .975
-r2     = .92; % .97
+r1     = .9199; % .975
+r2     = .920; % .97
 rho    = [r1; r2];
 alphaf = .0; % .95
-betaf  = .90; % .90
-betav  = [.9 .9 .74]; % .95
-betavs = [.9 .9 .74]; % .965
+betaf  = .89; % .90
+betav  = [.88 .91 .74]; % .95
+betavs = [.89 .91 .75]; % .965
 nz     = 2;
 nDv    = length(betav);
 nDvs   = length(betavs);
@@ -85,19 +85,19 @@ NN   = nNv+nNvs+2;
 Nrho = length(rho);
 Nr   = NN-Nrho-2;
 % Nr   = 0;
-% x    = [rho; rand(Nr,1); 1; 1];
-x    = [rho; .2; 0.1; 1; 1];
+x    = [rho; rand(Nr,1)/10+.2; 1; 1];
+% x    = [rho; .2; 0.1; 1; 1];
 Nx   = length(x);
 Av   = zeros(Nx,NN);
 Bv   = zeros(Nx,1);
 
-Pis = 1
+Pis = 1;
 for j = 1:nDvs
     Pis = conv(Pis,[1 -betavs(j)]);
 end
 Pis = tf(Pis,1,Ts);
 
-Pi = 1
+Pi = 1;
 for j = 1:nDv
     Pi = conv(Pi,[1 -betav(j)]);
 end
@@ -130,12 +130,15 @@ for i = 1:Nx
         Bv(i) = Kr*evalfr(Pi,x(i));
     end
 end
-
+% Av = Av(:,1:6);
+% Av = Av([1 2 4 5 6 7],:);
+% Bv = Bv([1 2 4 5 6 7]);
 v = Av\Bv;
 
 nVs = v(1:nNvs+1)';
+% nV  = [v(nNvs+2:end)' 0];
 nV  = v(nNvs+2:end)';
-Vs = tf(nVs,dVs,Ts)
+Vs = tf(nVs,dVs,Ts);
 V  = tf(nV,dV,Ts)
 % Vs = tf([v(1) v(2)],dVs,Ts)
 % V  = tf([v(3) v(4)],dV,Ts)
@@ -145,17 +148,17 @@ S   = phi-Vs*z^-d;
 S   = minreal(S);
 Ceq = 1/(S+1);
 YR  = series(feedback(series(Ceq,Pr),V),Kr);
-zpk(YR)
-if (evalfr(V,1)-Kr < 1e-10)
+zpk(YR);
+if (abs(evalfr(V,1)-Kr) < 1e-8)
     disp('V(1) == Kr, ok!')
 else
-    disp('V(1) =/= Kr, error!')
+    disp(['V(1) =/= Kr, error!' num2str(evalfr(V,1)-Kr)])
 end
 
-if (evalfr(phi-Vs+1,1) < 1e-10)
+if (abs(evalfr(phi-Vs+1,1)) < 1e-8)
     disp('Ceq(1) == inf, ok!')
 else
-    disp('Ceq(1) =/= inf, error!')
+    disp(['Ceq(1) =/= inf, error!' num2str(evalfr(phi-Vs+1,1))])
 end
 
 [zz,pp,kk] = zpkdata(YR,'v');
